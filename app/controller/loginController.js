@@ -46,5 +46,85 @@ class LoginController extends Controller {
             ctx.body = R.retrunResult(false,1,"账号或密码不正确","操作失败");
         }
     }
+
+    // 修改密码
+    async changePassWord(){
+        const {ctx} = this;
+        let login_account = this.ctx.request.body.login_account;
+        let newPwd = this.ctx.request.body.newPwd;
+        let oldPwd = this.ctx.request.body.oldPwd;
+        newPwd = MD5.md5(newPwd)
+        oldPwd = MD5.md5(oldPwd)
+        // 检查账号是否存在
+        let userExist = await this.app.mysql.query('select count(*) as count from user where login_account = ?',[login_account])
+        userExist = TOOL.jsonFromatSingle(userExist)
+        if(userExist.count > 0){
+            // 用户存在
+            // 校验旧密码是否正确
+            let oldPwdCheck = await this.app.mysql.query("select count(*) as count from user where login_account = ? and pwd = ?",[login_account,oldPwd])
+            oldPwdCheck   = TOOL.jsonFromatSingle(oldPwdCheck)
+            if(oldPwdCheck.count > 0){
+                // 旧密码正确
+                // 更改旧密码
+                let selection = {
+                    "login_account":login_account,
+                    "pwd":oldPwd
+                }
+                let row = {
+                    "pwd":newPwd
+                }
+                // 更新密码
+                let updateCount = await ctx.service.currencyService.currencyUpdate("user",row,selection);
+                if(updateCount.updateSuccess > 0) {
+                    ctx.body = R.retrunResult(true, 0, updateCount.updateSuccess, "操作成功");
+                }else{
+                    ctx.body = R.retrunResult(false,1,"修改失败","操作失败");
+                }
+            }else{
+                // 旧密码错误
+                ctx.body = R.retrunResult(false,1,"旧密码错误","操作失败");
+            }
+        }else{
+            // 用户不存在
+            ctx.body = R.retrunResult(false,1,"用户不存在","操作失败");
+        }
+    }
+    // 忘记密码
+    async forgetPassword(){
+        const {ctx} = this;
+        let login_account = this.ctx.request.body.login_account;
+        let newPwd = this.ctx.request.body.newPwd;
+        let confirmPwd = this.ctx.request.body.confirmPwd;
+        // 检查新密码和确认密码是否一致
+        if(newPwd === confirmPwd){
+            // 密码一致
+            // 检查账号是否存在
+            let userExist = await this.app.mysql.query('select count(*) as count from user where login_account = ?',[login_account])
+            userExist = TOOL.jsonFromatSingle(userExist)
+            if(userExist.count > 0) {
+                // 用户存在
+                // 更新密码
+                let selection = {
+                    "login_account":login_account
+                }
+                newPwd = MD5.md5(newPwd)
+                let row = {
+                    "pwd":newPwd
+                }
+                let updateCount = await ctx.service.currencyService.currencyUpdate("user",row,selection);
+                if(updateCount.updateSuccess > 0) {
+                    ctx.body = R.retrunResult(true, 0, updateCount.updateSuccess, "操作成功");
+                }else{
+                    ctx.body = R.retrunResult(false,1,"修改失败","操作失败");
+                }
+            }else{
+                // 用户不存在
+                ctx.body = R.retrunResult(false,1,"用户不存在","操作失败");
+            }
+        }else{
+            // 密码不一致
+            ctx.body = R.retrunResult(false,1,"密码与确认密码不一致","操作失败");
+        }
+    }
 }
 module.exports = LoginController;
