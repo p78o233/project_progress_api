@@ -33,11 +33,29 @@ class LoginController extends Controller {
                 }
                 let columns = ["id"];
                 let order = [['id','desc']]
+                // 获取用户信息
                 let userId = await ctx.service.currencyService.currencySelect('user',selection,columns,order,1,0);
                 userId = TOOL.jsonFromatSingle(userId)
-                let returnResult = {
+                let userInfo = {
                     "userId":userId.id,
                     "token":token
+                }
+                // 获取用户能够使用的菜单列表
+                // 初级菜单
+                let menuInfo = await ctx.service.loginService.currencySelect(userId.id,0,0)
+                for(let i = 0 ; i < menuInfo.length ;i++){
+                    // 获取第二级菜单
+                    let secondMenuInfo = await ctx.service.loginService.currencySelect(userId.id,1,menuInfo[i].id)
+                    for(let j = 0 ;j < secondMenuInfo.length ;j++){
+                        // 获取第三级菜单
+                        let thirdMenuInfo = await ctx.service.loginService.currencySelect(userId.id,2,secondMenuInfo[j].id)
+                        secondMenuInfo[j].children = thirdMenuInfo;
+                    }
+                    menuInfo[i].children = secondMenuInfo
+                }
+                let returnResult = {
+                    "userInfo":userInfo,
+                    "menuInfo":menuInfo
                 }
                 ctx.body = R.retrunResult(true,0,returnResult,"操作成功");
             }

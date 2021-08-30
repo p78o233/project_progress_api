@@ -17,9 +17,10 @@ module.exports = appInfo => {
 
     // 中间件的文件名
     config.middleware = ['middlewareFilter'];
-    //指定某些路径不过滤,可以用数组展示 config后面跟的是中间件的名称
+    //指定某些路径不过滤,可以用数组展示 config后面跟的是中间件的名称,可以用*号来模糊校验的路径
     config.middlewareFilter = {
-        ignore: ['/project_progress/api/login', '/project_progress/api/changePassWord','/project_progress/api/forgetPassword']
+        // 登录接口这个过滤器不过滤
+        ignore: ['/project_progress/api/login/*']
     }
 
   // add your user config here

@@ -1,5 +1,6 @@
 var R = require('../utils/responseBean.js');
 var TOOL = require('../utils/tools.js');
+// 这个模块是校验客户端的token，即路径前缀为/project_progress/api/*
 module.exports = (options, app) => {
     return async function auth(ctx, next) {
         // 1、检查token是否正常
