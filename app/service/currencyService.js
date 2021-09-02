@@ -19,7 +19,7 @@ class CurrencyService extends Service{
             "insertId":result.insertId,
             "affectedRows":result.affectedRows
         }
-        return {insertResult}
+        return insertResult
     }
 
     // 通用更新，第一个参数是表名称，第二个参数是更新的字段，第三个参数是筛选条件

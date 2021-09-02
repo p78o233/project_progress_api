@@ -11,4 +11,6 @@ module.exports = app => {
     require('./router/currencyRouter')(app);
     // 引入登录路由
     require('./router/loginRouter')(app);
+    // 引入角色管理
+    require('./router/roleRouter')(app);
 };

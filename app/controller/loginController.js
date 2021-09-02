@@ -37,7 +37,7 @@ class LoginController extends Controller {
                 let userId = await ctx.service.currencyService.currencySelect('user',selection,columns,order,1,0);
                 userId = TOOL.jsonFromatSingle(userId)
                 let userInfo = {
-                    "userId":userId.id,
+                    "userid":userId.id,
                     "token":token
                 }
                 // 获取用户能够使用的菜单列表
